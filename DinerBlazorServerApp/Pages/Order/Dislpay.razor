@@ -3,11 +3,16 @@
 @using DinerBlazorServerApp.Models
 @inject IFoodData foodData
 @inject IOrderData orderData
+@inject NavigationManager navigationManager
 
 
 <h3>Dislpay</h3>
 
-@if (order is null)
+@if (recordNotFound)
+{
+    <h4>No record found</h4>
+}
+else if (order is null)
 {
     <h4>Record Loading... <a class="spinner-border text-info"></a></h4>
 }
@@ -35,6 +40,19 @@ else
                 <td><strong>Quantity Orderd</strong></td>
                 <td>@order.Quantity</td>
             </tr>
+            <tr>
+                <td colspan="2">
+                    @if (confirmDelete)
+                    {
+                        <button class="btn btn-outline-danger" @onclick="HandleDeleteRecord">Confirm Delete</button>
+                        <button class="btn btn-secondary" @onclick="(() => confirmDelete = false)">Cancel</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-danger" @onclick="(() => confirmDelete = true)">Delete Order</button>
+                    }
+                </td>
+            </tr>
         </tbody>
     </table>
     <EditForm Model="@updateModel" OnValidSubmit="HandleValidSubmit">
@@ -59,6 +77,8 @@ else
 
     private OrderModel order;
     private string itemPurchased;
+    private bool confirmDelete = false;
+    private bool recordNotFound = false;
     private OrderUpdateModel updateModel = new OrderUpdateModel();
 
     protected override async Task OnInitializedAsync()
@@ -74,11 +94,21 @@ else
             updateModel.Id = order.Id;
             updateModel.OrderName = order.OrderName;
         }
+        else
+        {
+            recordNotFound = true;
+        }
     }
 
     private async Task HandleValidSubmit()
     {
         await orderData.UpdateOrderName(updateModel.Id, updateModel.OrderName);
         order.OrderName = updateModel.OrderName;
+    }
+
+    private async Task HandleDeleteRecord()
+    {
+        await orderData.DeleteOrder(Id);
+        navigationManager.NavigateTo("/food/list");
     }
 }
