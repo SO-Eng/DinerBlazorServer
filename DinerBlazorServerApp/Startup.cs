@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using DataLibrary.Data;
+using DataLibrary.Db;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DinerBlazorServerApp.Data;
 
 namespace DinerBlazorServerApp
 {
@@ -28,7 +23,13 @@ namespace DinerBlazorServerApp
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton(new ConnectionsStringData()
+            {
+                SqlConnectionName = "Default"
+            });
+            services.AddSingleton<IDataAccess, SqlDb>();
+            services.AddSingleton<IFoodData, FoodData>();
+            services.AddSingleton<IOrderData, OrderData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
