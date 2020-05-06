@@ -25,7 +25,7 @@ namespace DinerBlazorServerApp
             services.AddServerSideBlazor();
             services.AddSingleton(new ConnectionsStringData()
             {
-                SqlConnectionName = "Default"
+                SqlConnectionName = "LocalDB"
             });
             services.AddSingleton<IDataAccess, SqlDb>();
             services.AddSingleton<IFoodData, FoodData>();
